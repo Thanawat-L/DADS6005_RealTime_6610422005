@@ -140,18 +140,19 @@ else:
 
 # Create Layout
 with st.container():
-    col1, col2 = st.columns(2) 
-    with col1:
-        st.plotly_chart(fig_01, use_container_width=True)
-    with col2:
-        st.plotly_chart(fig_02, use_container_width=True)
+    col1 = st.columns(1) 
+    st.plotly_chart(fig_01, use_container_width=True)
 
 with st.container():
     col1, col2 = st.columns(2)
     with col1:
-        st.plotly_chart(fig_03, use_container_width=True)
+        st.plotly_chart(fig_02, use_container_width=True)
     with col2:
         st.plotly_chart(fig_04, use_container_width=True)
+
+with st.container():
+    col1 = st.columns(1) 
+    st.plotly_chart(fig_03, use_container_width=True)
 
 # Refresh logic
 if auto_refresh:
