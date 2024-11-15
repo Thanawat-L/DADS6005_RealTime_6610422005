@@ -8,7 +8,6 @@ import time
 conn = connect(host = '47.129.162.84', port = 8099, path = '/query/sql', schema = 'http')
 
 # DataFrame_01:------------------------------------------------------------
-conn = connect(host = '47.129.162.84', port = 8099, path = '/query/sql', schema = 'http')
 curs_01 = conn.cursor()
 
 query_01 = """SELECT YEAR, GENRE FROM game_users_tumbling_window_topic WHERE YEAR >= 1900 LIMIT 100000"""
