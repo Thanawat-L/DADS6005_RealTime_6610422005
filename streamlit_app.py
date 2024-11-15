@@ -8,20 +8,22 @@ import time
 conn = connect(host = '47.129.162.84', port = 8099, path = '/query/sql', schema = 'http')
 
 # DataFrame_01:------------------------------------------------------------
+conn = connect(host = '47.129.162.84', port = 8099, path = '/query/sql', schema = 'http')
 curs_01 = conn.cursor()
-query_01 = """SELECT * FROM game_users_tumbling_window_topic LIMIT 100000"""
+
+query_01 = """SELECT YEAR, GENRE FROM game_users_tumbling_window_topic WHERE YEAR >= 1900 LIMIT 100000"""
 
 curs_01.execute(query_01)
 result_01 = curs_01.fetchall()
-df_01 = pd.DataFrame(result_01, columns =['GAME_NAME','GENRE','PAGE_ID','PLATFORM','PUBLISHER','RATING_COUNT','WINDOWEND','WINDOWSTART','WINDOW_END','WINDOW_START','YEAR','timestamp'])
-df_01['timestamp'] = pd.to_datetime(df_01['timestamp'], unit='ms')
+df_01 = pd.DataFrame(result_01, columns =['YEAR','GENRE'])
+# df_01 = pd.DataFrame(result_01, columns =['GENRE','PAGE_ID','PLATFORM','PUBLISHER','RATING_COUNT','WINDOWEND','WINDOWSTART','WINDOW_END','WINDOW_START','YEAR','timestamp'])
+# df_01['timestamp'] = pd.to_datetime(df_01['timestamp'], unit='ms')
 
 pd.set_option('future.no_silent_downcasting', True)
 
 df_01 = df_01.replace("null", np.nan).replace(0, np.nan)
 df_01 = df_01.infer_objects(copy=False)
 df_01 = df_01.dropna(subset=[col for col in df_01.columns if col not in ['PAGE_ID', 'WINDOWEND', 'WINDOWSTART']])
-
 # Graph_01:------------------------------------------------------------
 genre_counts_by_year = df_01.groupby(['YEAR', 'GENRE']).size().unstack().fillna(0)
 df_plot = genre_counts_by_year.reset_index().melt(id_vars='YEAR', value_name='Count', var_name='Genre')
@@ -40,12 +42,13 @@ fig_01.update_xaxes(rangeslider_visible=True)
 
 # DataFrame_02:------------------------------------------------------------
 curs_02 = conn.cursor()
-query_02 = """SELECT * FROM game_users_session_window_topic LIMIT 100000"""
+query_02 = """SELECT GENRE, PLATFORM FROM game_users_session_window_topic LIMIT 100000"""
 
 curs_02.execute(query_02)
 result_02 = curs_02.fetchall()
-df_02 = pd.DataFrame(result_02, columns =['GAME_NAME','GENRE','PAGE_ID','PLATFORM','PUBLISHER','RATING_COUNT','SESSION_END_TS','SESSION_LENGTH_MS','SESSION_START_TS','WINDOWEND','WINDOWSTART','YEAR','timestamp'])
-df_02['timestamp'] = pd.to_datetime(df_02['timestamp'], unit='ms')
+df_02 = pd.DataFrame(result_02, columns =['GENRE','PLATFORM'])
+# df_02 = pd.DataFrame(result_02, columns =['GAME_NAME','GENRE','PAGE_ID','PLATFORM','PUBLISHER','RATING_COUNT','SESSION_END_TS','SESSION_LENGTH_MS','SESSION_START_TS','WINDOWEND','WINDOWSTART','YEAR','timestamp'])
+# df_02['timestamp'] = pd.to_datetime(df_02['timestamp'], unit='ms')
 
 pd.set_option('future.no_silent_downcasting', True)
 
@@ -85,12 +88,13 @@ df_03 = df_03.dropna(subset=[col for col in df_03.columns if col not in ['PAGE_I
 
 # DataFrame_04:------------------------------------------------------------
 curs_04 = conn.cursor()
-query_04 = """SELECT * FROM pageviews_game_users_join_topic LIMIT 100000"""
+query_04 = """SELECT GAME_NAME, GENRE,GLOBAL_SALES, JP_SALES, NA_SALES FROM pageviews_game_users_join_topic LIMIT 100000"""
 
 curs_04.execute(query_04)
 result_04 = curs_04.fetchall()
-df_04 = pd.DataFrame(result_04, columns =['EU_SALES','GAME_NAME','GENDER','GENRE','GLOBAL_SALES','JP_SALES','NA_SALES','OTHER_SALES','PLATFORM','PUBLISHER','PV_PAGEID','PV_USERID','REGIONID','VIEWTIME','YEAR','timestamp'])
-df_04['timestamp'] = pd.to_datetime(df_04['timestamp'], unit='ms')
+df_04 = pd.DataFrame(result_04, columns =['GAME_NAME', 'GENRE','GLOBAL_SALES','JP_SALES','NA_SALES'])
+# df_04 = pd.DataFrame(result_04, columns =['EU_SALES','GAME_NAME','GENDER','GENRE','GLOBAL_SALES','JP_SALES','NA_SALES','OTHER_SALES','PLATFORM','PUBLISHER','PV_PAGEID','PV_USERID','REGIONID','VIEWTIME','YEAR','timestamp'])
+# df_04['timestamp'] = pd.to_datetime(df_04['timestamp'], unit='ms')
 
 pd.set_option('future.no_silent_downcasting', True)
 
@@ -119,7 +123,7 @@ fig_04 = px.pie(
 )
 
 # Streamlit layout
-st.set_page_config(page_title="Gundam Views Dashboard", layout="wide")
+st.set_page_config(page_title="Games Sale Views Dashboard", layout="wide")
 st.title("Game Sales Analysis")
 
 # Set up auto-refresh options
